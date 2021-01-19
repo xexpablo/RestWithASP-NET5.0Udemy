@@ -36,13 +36,20 @@ namespace RestWithASPNETUdemy.Controllers
                 }
                 else if (op == "div")
                 {
-                    var div = ConvertToDecimal(firstNumber) / ConvertToDecimal(secondNumber);
-                    op = div.ToString();
+                    if (ConvertToDecimal(secondNumber) != 0 || ConvertToDecimal(secondNumber) > 0)
+                    {
+                        var div = ConvertToDecimal(firstNumber) / ConvertToDecimal(secondNumber);
+                        op = div.ToString();
+                    }
+                    else
+                    {
+                        return BadRequest("Não se divide por ZERO");
+                    }
                 }
                 else if (op == "multi")
                 {
-                    var multi = ConvertToDecimal(firstNumber) * ConvertToDecimal(secondNumber);
-                    op = multi.ToString();
+                        var multi = ConvertToDecimal(firstNumber) * ConvertToDecimal(secondNumber);
+                        op = multi.ToString();
                 }
                 else if (op == "media")
                 {
