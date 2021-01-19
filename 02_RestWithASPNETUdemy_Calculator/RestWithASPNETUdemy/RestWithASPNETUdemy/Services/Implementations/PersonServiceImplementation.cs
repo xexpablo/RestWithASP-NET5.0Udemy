@@ -1,70 +1,86 @@
 ﻿using RestWithASPNETUdemy.Model;
+using RestWithASPNETUdemy.Model.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RestWithASPNETUdemy.Services.Implementations
 {
     public class PersonServiceImplementation : IPersonService
     {
-        private volatile int count;
-        public Person Create(Person person)
+        private MySQLContext _context;
+        //------------------------------------------------------------------------------------------- Buscar o Contexto dos Dados
+        public PersonServiceImplementation(MySQLContext context)
         {
-            return person;
+            _context = context;
         }
-
-        public void Delete(long id)
-        {
-            
-        }
-
-        public Person Update(Person person)
-        {
-            return person;
-        }
-
+        //------------------------------------------------------------------------------------------- Buscar ID Registrado
         public Person FindByID(long id)
         {
-            return new Person
-            {
-                Id = IncrementAndGet(),
-                FirstName = "Pablo",
-                LastName = "Caun",
-                Address = "São Paulo",
-                Gender = "Male"
-            };
+            return _context.Persons.SingleOrDefault(p => p.Id.Equals(id));
         }
-
+        //------------------------------------------------------------------------------------------- Buscar Todos Registrados
         public List<Person> FindAll()
         {
-            List<Person> persons = new List<Person>();
-            for(int i = 0; i < 8; i++)
+            return _context.Persons.ToList();
+        }
+        //------------------------------------------------------------------------------------------- Criar Novo Registro
+        public Person Create(Person person)
+        {
+            try
             {
-                Person person = MockPerson(i);
-                persons.Add(person);
+                _context.Add(person);
+                _context.SaveChanges();
             }
-            return persons;
-        }
-
-        private Person MockPerson(int i)
-        {
-            return new Person
+            catch (Exception)
             {
-                Id = IncrementAndGet(),
-                FirstName = "Person First Name " + i,
-                LastName = "Person Last Name " + i,
-                Address = "Country, City " + i,
-                Gender = "Male"
-             };
+                throw;
+            }
+            return person;
         }
-
-        private long IncrementAndGet()
+        //------------------------------------------------------------------------------------------- Atualizar Registro
+        public Person Update(Person person)
         {
-            return Interlocked.Increment(ref count);
+            if (!Exists(person.Id)) return new Person();
+
+            var result = _context.Persons.SingleOrDefault(p => p.Id.Equals(person.Id));
+            if (result != null)
+            {
+                try
+                {
+                    _context.Entry(result).CurrentValues.SetValues(person);
+                    _context.SaveChanges();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            
+            return person;
+        }
+        //------------------------------------------------------------------------------------------- Deletar Registro
+        public void Delete(long id)
+        {
+            var result = _context.Persons.SingleOrDefault(p => p.Id.Equals(id));
+            if (result != null)
+            {
+                try
+                {
+                    _context.Persons.Remove(result);
+                    _context.SaveChanges();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+        //------------------------------------------------------------------------------------------- Confirmar a Existencia do ID
+        private bool Exists(long id)
+        {
+            return _context.Persons.Any(p => p.Id.Equals(id));
         }
 
-        
     }
 }
