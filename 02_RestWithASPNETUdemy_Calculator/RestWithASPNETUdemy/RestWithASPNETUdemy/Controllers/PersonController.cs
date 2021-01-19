@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using RestWithASPNETUdemy.Model;
+using RestWithASPNETUdemy.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,93 +10,55 @@ using System.Threading.Tasks;
 namespace RestWithASPNETUdemy.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class CalculatorController : ControllerBase
+    [Route("api/[controller]")]
+    public class PersonController : ControllerBase
     {
-        private readonly ILogger<CalculatorController> _logger;
-
-        public CalculatorController(ILogger<CalculatorController> logger)
+        private readonly ILogger<PersonController> _logger;
+        private IPersonService _personService;
+        public PersonController(ILogger<PersonController> logger, IPersonService personService)
         {
             _logger = logger;
+            _personService = personService;
         }
+        //------------------------------------------------------------------------------------------
+        [HttpGet] // Pegar todos
 
-        [HttpGet("{op}/{firstNumber}/{secondNumber}")]
-
-        public IActionResult Get(string op, string firstNumber, string secondNumber)
+        public IActionResult Get()
         {
-            if(IsNumeric(firstNumber) && IsNumeric(secondNumber))
-            {
-                if (op == "sum")
-                {
-                    var sum = ConvertToDecimal(firstNumber) + ConvertToDecimal(secondNumber);
-                    op = sum.ToString();
-                }
-                else if(op == "sub")
-                {
-                    var sub = ConvertToDecimal(firstNumber) - ConvertToDecimal(secondNumber);
-                    op = sub.ToString();
-                }
-                else if (op == "div")
-                {
-                    if (ConvertToDecimal(secondNumber) != 0 || ConvertToDecimal(secondNumber) > 0)
-                    {
-                        var div = ConvertToDecimal(firstNumber) / ConvertToDecimal(secondNumber);
-                        op = div.ToString();
-                    }
-                    else
-                    {
-                        return BadRequest("Não se divide por ZERO");
-                    }
-                }
-                else if (op == "multi")
-                {
-                        var multi = ConvertToDecimal(firstNumber) * ConvertToDecimal(secondNumber);
-                        op = multi.ToString();
-                }
-                else if (op == "media")
-                {
-                    var media = (ConvertToDecimal(firstNumber) + ConvertToDecimal(secondNumber)) / 2;
-                    op = media.ToString();
-                }
-                else if (op == "raiz")
-                {
-                    var raiz = Math.Sqrt((ConvertToDouble(firstNumber)));
-                    op = raiz.ToString();
-                }
-                return Ok(op.ToString());
-            }
-            return BadRequest("Invalid Input");
+            return Ok(_personService.FindAll());
         }
+        //------------------------------------------------------------------------------------------
+        [HttpGet("{id}")] // Busca Individual
 
-        private decimal ConvertToDecimal(string strNumber)
+        public IActionResult Get(long id)
         {
-            decimal decimalValue;
-            if (decimal.TryParse(strNumber, out decimalValue))
-            {
-                return decimalValue;
-            }
-            return 0;
+            var person = _personService.FindByID(id);
+            if (person == null) return NotFound("Não encontramos! Tente um ID valido");
+            return Ok(person);
         }
+        //------------------------------------------------------------------------------------------
+        [HttpPost] // Criar Perfil Person
 
-        private double ConvertToDouble(string strNumber)
+        public IActionResult Post([FromBody] Person person)
         {
-            double doubleValue;
-            if (double.TryParse(strNumber, out doubleValue))
-            {
-                return doubleValue;
-            }
-            return 0;
+            if (person == null) return BadRequest();
+            return Ok(_personService.Create(person));
         }
+        //------------------------------------------------------------------------------------------
+        [HttpPut] // Atualizar Perfil Person
 
-        private bool IsNumeric(string strNumber)
+        public IActionResult Put([FromBody] Person person)
         {
-            double number;
-            bool isNumber = double.TryParse(
-                strNumber,
-                System.Globalization.NumberStyles.Any,
-                System.Globalization.NumberFormatInfo.InvariantInfo,
-                out number);
-            return isNumber;
+            if (person == null) return BadRequest();
+            return Ok(_personService.Update(person));
+        }
+        //------------------------------------------------------------------------------------------
+        [HttpDelete("{id}")] // Deleta Perfil Person
+
+        public IActionResult Delete(long id)
+        {
+            _personService.Delete(id);
+            return NoContent();
         }
     }
 }
