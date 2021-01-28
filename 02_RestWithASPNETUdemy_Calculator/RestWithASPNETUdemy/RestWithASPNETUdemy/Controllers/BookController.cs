@@ -12,54 +12,54 @@ namespace RestWithASPNETUdemy.Controllers
     [ApiVersion("1")]
     [ApiController]
     [Route("api-{version:ApiVersion}/[controller]")]
-    public class PersonController : ControllerBase
+    public class BookController : ControllerBase
     {
-        private readonly ILogger<PersonController> _logger;
+        private readonly ILogger<BookController> _logger;
 
-        private IPersonBusiness _personBusiness;
-        public PersonController(ILogger<PersonController> logger, IPersonBusiness personBusiness)
+        private IBookBusiness _bookBusiness;
+        public BookController(ILogger<BookController> logger, IBookBusiness bookBusiness)
         {
             _logger = logger;
-            _personBusiness = personBusiness;
+            _bookBusiness = bookBusiness;
         }
         //------------------------------------------------------------------------------------------
         [HttpGet] // Pegar todos
 
         public IActionResult Get()
         {
-            return Ok(_personBusiness.FindAll());
+            return Ok(_bookBusiness.FindAll());
         }
         //------------------------------------------------------------------------------------------
         [HttpGet("{id}")] // Busca Individual
 
         public IActionResult Get(long id)
         {
-            var person = _personBusiness.FindByID(id);
-            if (person == null) return NotFound("Não encontramos! Tente um ID valido");
-            return Ok(person);
+            var book = _bookBusiness.FindByID(id);
+            if (book == null) return NotFound("Não encontramos! Tente um ID valido");
+            return Ok(book);
         }
         //------------------------------------------------------------------------------------------
-        [HttpPost] // Criar Perfil Person
+        [HttpPost] // Criar Perfil Book
 
-        public IActionResult Post([FromBody] Person person)
+        public IActionResult Post([FromBody] Book book)
         {
-            if (person == null) return BadRequest();
-            return Ok(_personBusiness.Create(person));
+            if (book == null) return BadRequest();
+            return Ok(_bookBusiness.Create(book));
         }
         //------------------------------------------------------------------------------------------
-        [HttpPut] // Atualizar Perfil Person
+        [HttpPut] // Atualizar Perfil Book
 
-        public IActionResult Put([FromBody] Person person)
+        public IActionResult Put([FromBody] Book book)
         {
-            if (person == null) return BadRequest();
-            return Ok(_personBusiness.Update(person));
+            if (book == null) return BadRequest();
+            return Ok(_bookBusiness.Update(book));
         }
         //------------------------------------------------------------------------------------------
-        [HttpDelete("{id}")] // Deleta Perfil Person
+        [HttpDelete("{id}")] // Deleta Perfil Book
 
         public IActionResult Delete(long id)
         {
-            _personBusiness.Delete(id);
+            _bookBusiness.Delete(id);
             return NoContent();
         }
     }
