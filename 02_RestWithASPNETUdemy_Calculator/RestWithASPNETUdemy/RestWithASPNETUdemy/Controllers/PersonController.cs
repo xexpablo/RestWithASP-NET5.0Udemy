@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using RestWithASPNETUdemy.Data.VO;
 
 namespace RestWithASPNETUdemy.Controllers
 {
@@ -39,23 +40,23 @@ namespace RestWithASPNETUdemy.Controllers
             return Ok(person);
         }
         //------------------------------------------------------------------------------------------
-        [HttpPost] // Criar Perfil Person
+        [HttpPost] // Criar Perfil PersonVO
 
-        public IActionResult Post([FromBody] Person person)
+        public IActionResult Post([FromBody] PersonVO person)
         {
             if (person == null) return BadRequest();
             return Ok(_personBusiness.Create(person));
         }
         //------------------------------------------------------------------------------------------
-        [HttpPut] // Atualizar Perfil Person
+        [HttpPut] // Atualizar Perfil PersonVO
 
-        public IActionResult Put([FromBody] Person person)
+        public IActionResult Put([FromBody] PersonVO person)
         {
             if (person == null) return BadRequest();
             return Ok(_personBusiness.Update(person));
         }
         //------------------------------------------------------------------------------------------
-        [HttpDelete("{id}")] // Deleta Perfil Person
+        [HttpDelete("{id}")] // Deleta Perfil PersonVO
 
         public IActionResult Delete(long id)
         {
